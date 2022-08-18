@@ -226,6 +226,7 @@ Write-Host "********** Completed copying latest build to QA1:  $(Get-Date) *****
 Write-Host "********** Setting Application Version - QA1 **********"
 AppSet-Version -path $qaOneSettings -version $buildNumber
 
+<#  ADDRESS LATER...
 # Create the Dynamic Model .dll on the REMOTE test server (QA1)
 Write-Host "********** Creating Dynamic Model .dll on Test Server **********"
 
@@ -237,6 +238,7 @@ $remoteScript = {
 
 Invoke-Command -ComputerName QA1-12 -ScriptBlock $remoteScript -Credential $credential
 Write-Host "********** Dynamic Model .dll created successfully on QA1 **********"
+#>
 
 # Restart IIS
 Write-Host "********** Restarting IIS... **********"
