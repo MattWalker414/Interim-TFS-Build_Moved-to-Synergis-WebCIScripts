@@ -213,7 +213,7 @@ Invoke-Command -ComputerName QA1-12 -ScriptBlock { stop-service w3svc } -Credent
 # Exclude White Label related files (indexprismdocs.html/site_prismdocs.min.css) from push to QA1.  Other test servers should receive these types of files.
 
 Write-Host "********** Begin copying latest build to QA1:  $(Get-Date) **********"
-Robocopy $from $to /S /IS /Purge /xf connections.config appsettings.config iisstart.htm welcome.png indexprismdocs.html site_prismdocs.min.css /xd Dynamic aspnet_client jvue AdeptClientServices AdeptTaskPane Downloads
+Robocopy $from $to /S /IS /Purge /xf connections.config iisstart.htm welcome.png indexprismdocs.html site_prismdocs.min.css /xd Dynamic aspnet_client jvue AdeptClientServices AdeptTaskPane Downloads
 
 Write-Host "The QA1 copy exited with code: " $LastExitCode
 Check-Robocopy -roboreturn $LastExitCode
