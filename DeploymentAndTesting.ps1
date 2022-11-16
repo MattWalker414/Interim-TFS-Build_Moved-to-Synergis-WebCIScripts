@@ -33,7 +33,7 @@ $from = "\\fs2\Installs\nAWC12.0.0_Git\0_Development"
 $to = "\\QA1-12\wwwroot"
 
 # Set and correct this after Web install build environment set up.
-$buildTwoSettings = "\\BuildServer2\Synergis.WebAPI_12.0.0_Git\appsettings.config"  #Set up Future nAWC install build environment and share folder.
+$buildTwoSettings = "\\BuildServer2\Synergis.WebAPI_12.0.0\appsettings.config"  #Set up Future nAWC install build environment and share folder.
 $qaOneSettings = "\\QA1-12\wwwroot\Synergis.WebApi\appsettings.config"
 $qaTwoSettings = "\\QA2-12\wwwroot\Synergis.WebApi\appsettings.config"
 $devOneSettings = "\\DEV-12\wwwroot\Synergis.WebApi\appsettings.config"
