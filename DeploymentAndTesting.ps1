@@ -309,6 +309,7 @@ else
     
 
     # Run the full suite of tests...
+    Write-Host "##vso[task.setvariable variable=TestType]Nightly"
 
 
     <# RE-EVALUATE THE NEED FOR STOPPING ACS AFTER CLIENT SERVICES ADDED AND BUILDING
