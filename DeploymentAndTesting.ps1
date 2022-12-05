@@ -130,15 +130,12 @@ AppSet-Version -path $buildTwoSettings -version $buildNumber
 Write-Host "********** Application Version - Build2 set! **********"
 
 
-<# ADD WHEN ACS FINALIZED AND ADDED TO GIT
 #***************************************************************************
 #***********************  COPY ACS TO FS2  *********************************
 #***************************************************************************
 
 Write-Host "********** Copying latest ACS to \\fs2... **********"
-# ACS builds to one folder above $source so strip the last or actual source directory from string...
-#$acsDirectory = $source.Substring(0, $source.LastIndexOf("\")) + "\Program Files\Synergis\AdeptClientServices"
-$acsDirectory = $acsURLProtocolPath + "\Program Files\Synergis\AdeptClientServices"
+#$acsDirectory = "$source\Adept\ClientServices"
 
 Robocopy $acsDirectory $from\AdeptClientServices /S /IS /Purge /xf AdeptClientServices.vshost* /xd PlugIns ja ru
 
@@ -148,6 +145,7 @@ Write-Host "Post Robocopy return check exit code: " $LastExitCode
 
 Write-Host "********** ACS copied to \\fs2! **********"
 
+<#
 #***************************************************************************
 #*******************  COPY BUILDABLE PLUGINS TO FS2  ***********************
 #***************************************************************************
