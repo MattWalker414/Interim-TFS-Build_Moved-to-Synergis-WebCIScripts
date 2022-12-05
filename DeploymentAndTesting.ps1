@@ -135,7 +135,7 @@ Write-Host "********** Application Version - Build2 set! **********"
 #***************************************************************************
 
 Write-Host "********** Copying latest ACS to \\fs2... **********"
-#$acsDirectory = "$source\Adept\ClientServices"
+$acsDirectory = "$source\Adept\ClientServices"
 
 Robocopy $acsDirectory $from\AdeptClientServices /S /IS /Purge /xf AdeptClientServices.vshost* /xd PlugIns ja ru
 
