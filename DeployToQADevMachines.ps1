@@ -104,8 +104,8 @@ if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pat
     Write-Host "********** Restarting IIS on QA2: $(Get-Date) **********"
     Invoke-Command -ComputerName QA2-12 -ScriptBlock { Start-Service w3svc } -Credential $credential
 
-    #send-mailmessage -to "$tester@synergis.com", "$tester2@synergis.com", "$tester3@synergis.com", "$tester4@synergis.com" -from "$tester@synergis.com" -subject "QA2-12 Updated Successfully" -body "QA2-12 has been updated with the latest code changes (Build: $buildNumber)." -smtpServer mail.synergis.com -Attachments "$testLog"
-    send-mailmessage -to "$tester@synergis.com" -from "$tester@synergis.com" -subject "QA2-12 Updated Successfully" -body "QA2-12 has been updated with the latest code changes (Build: $buildNumber)." -smtpServer mail.synergis.com -Attachments "$testLog"
+    Write-Host "Notify of QA2/Dev system readiness..."
+    send-mailmessage -to "$tester@synergis.com" -from "$tester@synergis.com" -subject "QA2-12 Updated Successfully" -body "QA2-12 has been updated with the latest code changes (Build: $buildNumber)." -smtpServer mail.synergis.com
 
     Write-Host "********** QA2 Ready:  $(Get-Date)  **********"
 
