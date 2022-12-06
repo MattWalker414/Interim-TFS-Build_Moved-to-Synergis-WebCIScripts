@@ -248,8 +248,8 @@ Invoke-Command -ComputerName QA1-12 -ScriptBlock { Start-Service w3svc } -Creden
 # Reset the UI test level based on time...
 Write-Host "********** Checking test type time range... **********"
 
-$RangeStart = "5:00"
-$RangeEnd = "9:00"
+$RangeStart = "2:45"
+$RangeEnd = "6:45"
 
 $now = @(get-date)
 
