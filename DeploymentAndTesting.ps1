@@ -1,6 +1,4 @@
 ﻿Param(
-        [string]$uiType, 
-        [string]$inclDev,
         [string]$source,
         [string]$buildNumber,
         [string]$acsURLProtocolPath
@@ -224,7 +222,7 @@ Write-Host "********** Completed copying latest build to QA1:  $(Get-Date) *****
 Write-Host "********** Setting Application Version - QA1 **********"
 AppSet-Version -path $qaOneSettings -version $buildNumber
 
-<#  ADDRESS LATER...
+<#  ADDRESS LATER IF NEEDED...
 # Create the Dynamic Model .dll on the REMOTE test server (QA1)
 Write-Host "********** Creating Dynamic Model .dll on Test Server **********"
 
@@ -244,10 +242,8 @@ Invoke-Command -ComputerName QA1-12 -ScriptBlock { Start-Service w3svc } -Creden
  
 
 #***************************************************************************
-#*******************  UI TESTING  ******************************************
+#************************  UI TESTING SETUP ********************************
 #***************************************************************************
-
-# No need to remove the TestCafe report file as that will be removed or cleared with each build.
 
 # Reset the UI test level based on time...
 Write-Host "********** Checking test type time range... **********"
@@ -257,15 +253,20 @@ $RangeEnd = "9:00"
 
 $now = @(get-date)
 
-
 If ($now -gt $RangeStart -lt $RangeEnd)
 {
-    $uiType = "Full"
-    Write-Host "********** Running FULL test suite... **********"
+    Write-Host "********** Set Nightly Testing Environment Variable for Full Testing... **********"
+    Write-Host "##vso[task.setvariable variable=TestType]Nightly"
 }
 Else
 {
-    Write-Host "********** Running Basic, log in/out test... **********"
+    Write-Host "********** Set the CI Testing Environment Variable for CI Buile Testing.. **********"
+
+    # Nightly will be used for full suite testing.
+    Write-Host "##vso[task.setvariable variable=TestType]CI" 
+
+    # Trigger for ACS and reporting tasks...
+    Write-HOst "##vso[task.setvariable variable=TestCafe]True"
 }
 
 <# UNCOMENT WHEN ACS INCLUDED IN/PULLED AND BUILT FROM GIT REPO...
@@ -278,180 +279,6 @@ Check-Robocopy -roboreturn $LastExitCode
 Write-Host "Post Robocopy return check exit code: " $LastExitCode
 Write-Host "********** ACS PlugIns copied! **********"
 #>
-
-# Run the UI tests...
-
-Write-Host "********** Executing UI Tests **********"
-#***************************************************************************
-#********** Adjust here to run only login pending UI Test rework *********** 
-#***************************************************************************
-if($uiType -eq 'Basic')
-{
-    # Selenium
-    #&"$mstest" "/testcontainer:$source\Development\12.0\Web\AdeptWeb\Synergis.SeleniumUITest\Synergis.SeleniumUITest\bin\$bldType\Synergis.SeleniumUITest.dll" "/test:TestLoginOut" "/resultsfile:$xmlpath" | Out-File $resultsSummary    
-    
-    #***************************************************************************
-    #******************************** Test Cafe ******************************** 
-    #***************************************************************************
-
-    # Set to run test and publish test report if Basic UI tests running for now...
-    # Nightly will be used for full suite testing.
-    Write-Host "##vso[task.setvariable variable=TestType]CI" 
-
-    # Trigger for ACS and reporting tasks...
-    Write-HOst "##vso[task.setvariable variable=TestCafe]True"
-    
-}
-else
-{   
-    
-
-    # Run the full suite of tests...
-    Write-Host "##vso[task.setvariable variable=TestType]Nightly"
-
-
-    <# RE-EVALUATE THE NEED FOR STOPPING ACS AFTER CLIENT SERVICES ADDED AND BUILDING
-    # Stop ACS
-    Write-Host "********** Terminating Client Services... **********"
-    &"$acsDirectory\TerminateCS.exe"
-    #>
-}
-
-<# REWORK WHEN READY FOR TESTCAFE TESTING...
-Write-Host "********** Test execution complete! **********"
-
-# If failure, let me know...
-if($testresult -eq 'Failed')
-{  
-    # Send and Selenium Test errors and attach output file...
-    Write-Host "********** UI Test(s) failed! **********"
-
-    if($uiType -eq 'Full')
-    {
-        # Get summary information for email body and preserve formatting...
-        $filecontents = [string]::Join("`r`n",(get-content -path $resultsSummary))
-
-        # Notify wider QA group since QA2 will not be updated...
-        #send-mailmessage -to "$tester@synergis.com", "$tester2@synergis.com", "$tester3@synergis.com", "$tester4@synergis.com" -from "$tester@synergis.com" -subject "12.0.0 UI Tests Failed (QA2 NOT Updated!)" -body "$filecontents" -smtpServer mail.synergis.com -Attachments "$testLog"
-        
-        # Vacation recipients...
-        #send-mailmessage -to "$tester@synergis.com", "$tester1@synergis.com" -from "$tester@synergis.com" -subject "12.0.0 UI Tests Failed (QA2 NOT Updated!)" -body "$filecontents" -smtpServer mail.synergis.com -Attachments "$testLog"
-        send-mailmessage -to "$tester@synergis.com" -from "$tester@synergis.com" -subject "12.0.0 UI Tests Failed (QA2 NOT Updated!)" -body "$filecontents" -smtpServer mail.synergis.com -Attachments "$testLog"
-    }
-    #else  # Not needed with TestCafe at this time.
-    #{
-    #    send-mailmessage -to "$tester@synergis.com" -from "$tester@synergis.com" -subject "Release $uiType 12.0.0 UI Test(s) Failed" -body "$filecontents" -smtpServer mail.synergis.com -Attachments "$testLog"        
-    #}
-
-    Write-Host "********** Test failure notification sent! **********"
-    
-}
-else
-{
-    Write-Host "********** UI Test(s) Completed:  $(Get-Date) **********"
-    
-    if($uiType -eq 'Full')
-    {
-        #***************************************************************************
-        #*********************  UPDATE QA2/ORACLE SERVERS  *************************
-        #***************************************************************************
-
-        # Stop IIS on QA2, copy files, create Dynamic Models .dll, restazrt IIS, using credential info from above...
-        Write-Host "********** Stopping IIS on QA2:  $(Get-Date) **********"
-        Invoke-Command -ComputerName QA2-12 -ScriptBlock { stop-service w3svc } -Credential $credential
-        
-        $to = "\\QA2-12\wwwroot"
-        # Dynamic directory excluded as this is built at runtime and was causing permissions errors with Memo info after deletion via machine update.
-        # Exclude wwwroot files and directories as well.
-        Write-Host "********** Begin copying files from fs2 to QA2:  $(Get-Date) **********"
-        #Robocopy $from $to /S /IS /Purge /xf connections.config appsettings.config iisstart.htm welcome.png /xd Dynamic aspnet_client jvue AdeptClientServices Downloads
-        Robocopy $from $to /S /IS /Purge /xf connections.config appsettings.config iisstart.htm welcome.png indexprismdocs.html site_prismdocs.min.css /xd Dynamic aspnet_client jvue AdeptClientServices AdeptTaskPane Downloads
-
-        Write-Host "The QA2 copy exited with code: " $LastExitCode      
-        Check-Robocopy -roboreturn $LastExitCode
-        Write-Host "Post Robocopy return check exit code: " $LastExitCode
-
-        Write-Host "********** Completed copying files from fs2 to QA2:  $(Get-Date) **********"
-
-        # Update QA2 appsettings.config file...
-        Write-Host "********** Setting Application Version - QA2 **********"
-        AppSet-Version -path $qaTwoSettings -version $buildNumber
-
-        # Restart IIS
-        Write-Host "********** Restarting IIS on QA2: $(Get-Date) **********"
-        Invoke-Command -ComputerName QA2-12 -ScriptBlock { Start-Service w3svc } -Credential $credential
-
-        #send-mailmessage -to "$tester@synergis.com", "$tester2@synergis.com", "$tester3@synergis.com", "$tester4@synergis.com" -from "$tester@synergis.com" -subject "QA2-12 Updated Successfully" -body "QA2-12 has been updated with the latest code changes (Build: $buildNumber)." -smtpServer mail.synergis.com -Attachments "$testLog"
-        send-mailmessage -to "$tester@synergis.com" -from "$tester@synergis.com" -subject "QA2-12 Updated Successfully" -body "QA2-12 has been updated with the latest code changes (Build: $buildNumber)." -smtpServer mail.synergis.com -Attachments "$testLog"
-
-        Write-Host "********** QA2 Ready:  $(Get-Date)  **********"
-
-        #  Update Install Build appsettings.config file...
-        Write-Host "********** Setting Application Version on Install Build Server **********"
-        AppSet-Version -path $buildTwoSettings -version $buildNumber
-
-        # Update Dev troubleshooting server...
-        if($inclDev -eq 'Y')
-        {
-            #******************* DEV MACHINE UPDATE  ******************************************
-            Write-Host "********** DEV Server IIS Shutting down:  $(Get-Date) **********"
-            Invoke-Command -ComputerName DEV-12 -ScriptBlock { stop-service w3svc } -Credential $credential
-    
-            # Change destination
-            $to = "\\DEV-12\wwwroot"
-
-            Write-Host "********** Begin copying files from fs2 to DEV server:  $(Get-Date) **********"
-            #Robocopy $from $to /S /IS /Purge /xf connections.config appsettings.config iisstart.htm welcome.png /xd Dynamic aspnet_client jvue AdeptClientServices Downloads
-            Robocopy $from $to /S /IS /Purge /xf connections.config appsettings.config iisstart.htm welcome.png indexprismdocs.html site_prismdocs.min.css /xd Dynamic aspnet_client jvue AdeptClientServices AdeptTaskPane Downloads
-
-            Write-Host "The DEV Server copy exited with code: " $LastExitCode      
-            Check-Robocopy -roboreturn $LastExitCode
-            Write-Host "Post Robocopy return check exit code: " $LastExitCode
-
-            Write-Host "********** Completed copying files from fs2 to the DEV Server:  $(Get-Date) **********"
-
-            Write-Host "********** Setting Application Version - DEV Server **********"
-            AppSet-Version -path $devOneSettings -version $buildNumber         
-
-            # Restart IIS
-            Write-Host "********** Restarting IIS on Dev Server:  $(Get-Date) **********"
-            Invoke-Command -ComputerName DEV-12 -ScriptBlock { Start-Service w3svc } -Credential $credential
-            Write-Host "********** DEV Server Ready:  $(Get-Date) **********"
-               
-        } 
-        
-    }
-    
- }
-
- #>
-
-
-# If full UI tests were run, restore database on -QA1-12...
-if($uiType -eq 'Full')
-{
-    #***************************************************************************
-    #********************  CLEANUP  (Restoration Utility) **********************
-    #***************************************************************************
-
-    <# USE THIS RESTORE IF CLEANUP/ENVIRON. RESET UTILITY IS PROBLEMATIC.  DELETE OTHERWISE...
-    Write-Host "********** Restoring Db on QA1-12:  $(Get-Date) **********"
-    Invoke-Command -ComputerName QA1-12 -ScriptBlock { Invoke-SqlCmd "USE [master]; ALTER DATABASE [AdeptDatabase] SET  SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [AdeptDatabase]" } -Credential $credential
-    Invoke-Command -ComputerName QA1-12 -ScriptBlock { Restore-SqlDatabase -ServerInstance QA1-12 -Database AdeptDatabase -BackupFile "C:\DbBackup\AdeptDatabase.bak" } -Credential $credential
-    #Write-Host "********** Db Restore Status: $Error **********"
-
-    Write-Host "********** Db restored! **********"  
-    #>
-}
-Else
-{
-    Write-Host "********** No Db restore after Basic tests. **********"
-
-    # Going to star from a scripted .bat file launched before tests from Build Definition
-    #Write-Host "************ Starting ACS for TestCafe ***************"
-    #&"$acsDirectory\AdeptClientServices.exe" start
-}
-
 
 
 # Script build step erroring during Full build after Db restore.  Show latest error encountered.
