@@ -1,7 +1,7 @@
 @echo off
 @rem The Synergis.WebClient folder may revert to Synergis.WebApp once Angular 6 replaces previous fully.
 @set source=%1\AdeptWebClient
-@set target=\\fs2\installs\nAWC12.0.0_Git\0_Development\Synergis.WebApp
+@set target=\\fs2\installs\nAWC12.0.0\0_Development\Synergis.WebApp
 
 @rem echo -----> Remove existing --- commented as previous deployment cleared from post build script
 @rem del /q /s %target%\*.*
@@ -20,14 +20,15 @@ echo f | xcopy /e /y %source%\dist\webclient\*.* %target%
 
 goto end
 @rem Copy DynamicModel Compile .exe
-@set target=\\fs2\installs\nAWC12.0.0\0_Development\Synergis.WebApi\bin
+@rem Bin folder removed below for build from Git
+@set target=\\fs2\installs\nAWC12.0.0\0_Development\Synergis.WebApi
 
-@set source=%1\Development\12.0\Web\AdeptWeb\Synergis.DynamicModelConsole\bin\Release
+@set source=%1\AdeptWebServer\Synergis.DynamicModelConsole\bin\Release
 echo f | xcopy /y %source%\Synergis.DynamicModelConsole.exe %target%\
 echo f | xcopy /y %source%\Synergis.DynamicModelConsole.exe.config %target%\
 
-@rem - Get the correct Synergis.DomainModel.dll in place as there were issues building Dynamic Model .dll on Test Server...
-@set source=%1\Development\12.0\Web\AdeptWeb\Synergis.WebAPI\bin
+@rem - Get the correct Synergis.DomainModel.dll in place as there were issues building Dynamic Model .dll on Test Server (Changed for Git build)...
+@set source=%1\AdeptWebServer\Synergis.WebAPI\bin\Release
 echo f | xcopy /y %source%\Synergis.DomainModel.dll %target%\
 
 :end
