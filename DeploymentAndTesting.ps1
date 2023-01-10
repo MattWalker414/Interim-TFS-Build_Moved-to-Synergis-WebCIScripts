@@ -27,7 +27,7 @@ $tester = "Matt.Walker"
 #$tester4 = "Rashmi.Chinnawar"
 
 # Test Server Deployment information...
-$from = "\\fs2\Installs\nAWC12.0.0_Git\0_Development"
+$from = "\\fs2\Installs\nAWC12.0.0\0_Development"
 $to = "\\QA1-12\wwwroot"
 
 # Set and correct this after Web install build environment set up.
@@ -171,7 +171,7 @@ Write-Host "********** Buildable ACS PlugIns copied to \\fs2! **********"
 # not supported...
 Write-Host "********** Checking for unsupported languages in Viewer \bin folder... **********"
 
-if(test-path \\fs2\Installs\nAWC12.0.0_Git\0_Development\Synergis.WebViewer\bin\ja)
+if(test-path \\fs2\Installs\nAWC12.0.0\0_Development\Synergis.WebViewer\bin\ja)
 {
     Remove-Item -path \\fs2\Installs\nAWC12.0.0\0_Development\Synergis.WebViewer\bin\ja -recurse
 }
