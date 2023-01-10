@@ -1,7 +1,7 @@
 ﻿Param(
         [string]$buildNumber,
         [string]$source,
-        [string]$fileSource, # Pass -fileSource \\fs2\Installs\nAWC12.0.0_Git\0_Development on build step.
+        [string]$fileSource, # Pass -fileSource \\fs2\Installs\nAWC12.0.0\0_Development on build step.
         [string]$inclDev
      )
 
