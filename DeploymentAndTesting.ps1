@@ -143,6 +143,19 @@ Write-Host "Post Robocopy return check exit code: " $LastExitCode
 
 Write-Host "********** ACS copied to \\fs2! **********"
 
+#***************************************************************************
+#***************  COPY VIEWER SERVER CACHE CLEAR TO FS2  *******************
+#***************************************************************************
+Write-Host "********** Copy latest Viewer Server Cache Clear utility to Viewer area on \\fs2... **********"
+ 
+Robocopy $source\AdeptWebServer\AdeptClearViewerCache\bin\Release $from\AdeptViewer\Utilities\Cache /S /IS /Purge /xf *.pdb *.xml /xd de es fr-CA it pt-BR
+
+Write-Host "The Viewer Server Config Clean copy exited with code: " $LastExitCode
+Check-Robocopy -roboreturn $LastExitCode
+Write-Host "Post Robocopy return check exit code: " $LastExitCode
+
+Write-Host "********** Viewer Server Config Clear utility deployed to Viewer area on \\fs2! **********"
+
 <#
 #***************************************************************************
 #*******************  COPY BUILDABLE PLUGINS TO FS2  ***********************
