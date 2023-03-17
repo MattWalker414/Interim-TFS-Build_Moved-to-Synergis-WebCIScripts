@@ -75,14 +75,13 @@ function Check-Robocopy
                    Either a usage error or an error due to insufficient access privileges
                    on the source or destination directories.
 
-    Adjust logic accordingly based on returns encountered.
+    Adjust check based on returns encountered.
     #>
 
     if (($roboreturn -eq 3) -or ($roboreturn -eq 1)) # Some files copied successfully or new files (ACS)
     {
         $global:LastExitCode = 0
-    }
-        
+    }      
 }
 
 # Update build and test machine appsettings.config files...
@@ -101,10 +100,8 @@ function AppSet-Version
     catch
     {
         Write-Host "Version Set Error!... " + $_.Exception.Message
-    }
-    
+    }    
 }
-
 
 <#  ADD WHEN VERSIONING ADDED...
 #***************************************************************************
@@ -126,7 +123,6 @@ Write-Host "********** ACS Assembly versioning undone! **********"
 Write-Host "********** Setting Application Version - Build2 **********"
 AppSet-Version -path $buildTwoSettings -version $buildNumber
 Write-Host "********** Application Version - Build2 set! **********"
-
 
 #***************************************************************************
 #***********************  COPY ACS TO FS2  *********************************
@@ -230,29 +226,13 @@ Write-Host "Post Robocopy return check: " $LastExitCode
 
 Write-Host "********** Completed copying latest build to QA1:  $(Get-Date) **********"
 
-
 # Update appsettings.config file...
 Write-Host "********** Setting Application Version - QA1 **********"
 AppSet-Version -path $qaOneSettings -version $buildNumber
 
-<#  ADDRESS LATER IF NEEDED...
-# Create the Dynamic Model .dll on the REMOTE test server (QA1)
-Write-Host "********** Creating Dynamic Model .dll on Test Server **********"
-
-# Change directory to WebApi\bin for correct output from .exe...
-$remoteScript = {
-                    cd C:\inetpub\wwwroot\Synergis.WebApi\bin
-                    C:\inetpub\wwwroot\Synergis.WebApi\bin\Synergis.DynamicModelConsole.exe -output C:\inetpub\wwwroot\Synergis.webAPI\bin\
-                }
-
-Invoke-Command -ComputerName QA1-12 -ScriptBlock $remoteScript -Credential $credential
-Write-Host "********** Dynamic Model .dll created successfully on QA1 **********"
-#>
-
 # Restart IIS
 Write-Host "********** Restarting IIS... **********"
 Invoke-Command -ComputerName QA1-12 -ScriptBlock { Start-Service w3svc } -Credential $credential
- 
 
 #***************************************************************************
 #************************  UI TESTING SETUP ********************************
@@ -282,7 +262,7 @@ Else
     Write-HOst "##vso[task.setvariable variable=TestCafe]True"
 }
 
-<# UNCOMENT WHEN ACS INCLUDED IN/PULLED AND BUILT FROM GIT REPO...
+
 # Copy ACS \PlugIns folder from FS2 proior to starting for testing...
 Write-Host "********** Copying ACS PlugIns from \\fs2... **********"
 Robocopy $from\AdeptClientServices\PlugIns $acsDirectory\PlugIns /S /IS /Purge 
@@ -291,7 +271,7 @@ Write-Host "The ACS PlugIns copy exited with code: " $LastExitCode
 Check-Robocopy -roboreturn $LastExitCode
 Write-Host "Post Robocopy return check exit code: " $LastExitCode
 Write-Host "********** ACS PlugIns copied! **********"
-#>
+
 
 
 # Script build step erroring during Full build after Db restore.  Show latest error encountered.
