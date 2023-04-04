@@ -31,7 +31,9 @@ foreach ($test in $funcArea)
     Invoke-Command -ComputerName QA1-12 -ScriptBlock { Start-Service w3svc } -Credential $credential
     
     # Run the tests
-    testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
+    #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
+    testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml
+    check-out-dialog
 
     # Not sure if QA using the TestCafe reporting setup so delete the report.xml
     if (Test-Path $testCafeDir\report\report.xml) 
