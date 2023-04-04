@@ -33,7 +33,6 @@ foreach ($test in $funcArea)
     # Run the tests
     #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
     testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml
-    check-out-dialog
 
     # Not sure if QA using the TestCafe reporting setup so delete the report.xml
     if (Test-Path $testCafeDir\report\report.xml) 
