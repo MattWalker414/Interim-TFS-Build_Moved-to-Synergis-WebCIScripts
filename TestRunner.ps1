@@ -34,12 +34,20 @@ foreach ($test in $funcArea)
     #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
     testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml
 
+    <# This check should not be needed as the reporter setting will be ignored as a result of report setting on above command line.
     # Not sure if QA using the TestCafe reporting setup so delete the report.xml
     if (Test-Path $testCafeDir\report\report.xml) 
     {
         Remove-Item $testCafeDir\report\report.xml
+        Write-Host "Report.xml found and deleted."
     }
+    else
+    {
+        Write-Host "Report.xml NOT found."
+    }
+    #>
 
+    if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors.
 }
 
 Write-Host "********** IIS Shutting to restore Quality Db access... **********"
