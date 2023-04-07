@@ -1,11 +1,11 @@
-﻿Param(
+Param(
         [string]$buildNumber,
         [string]$source,
         [string]$fileSource, # Pass -fileSource \\fs2\Installs\nAWC12.0.0\0_Development on build step.
         [string]$inclDev
      )
 
-
+$deploy = true
 $qaTwoSettings = "\\QA2-12\wwwroot\Synergis.WebApi\appsettings.config"
 $devOneSettings = "\\DEV-12\wwwroot\Synergis.WebApi\appsettings.config"
 $tester = "matt.walker"
@@ -67,14 +67,29 @@ function AppSet-Version
     
 }
 
-Write-Host "********** Setting credentials for remote, test server operations... **********"
-$securePassword = ConvertTo-SecureString "3#sdfverM4tt!syner" -AsPlainText -force
-$credential = New-Object System.Management.Automation.PsCredential("ssetestdom\builduser",$securePassword)
+# Check the test result files for "failure" and update test servers accordingly...
+Get-ChildItem $source\Testing\TestCafe\Scripts\report |
+ForEach-Object {
+    Write-Host $_.FullName
 
-# Check the test result file for "failure" and update test servers accordingly...
+    $xml = [xml](Get-Content $_.FullName)
+    $failures = $xml.testsuite.failures
 
-if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pattern 'failures="0"') -ne $null)
+    if ($failures -ne 0)
+    {        
+        $deploy = false
+    }
+    
+    Write-Host "$failures Failures detected in" $_.FullName
+}
+
+#if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pattern 'failures="0"') -ne $null)
+if ($deploy = true)
 {
+    Write-Host "********** Setting credentials for remote, test server operations... **********"
+    $securePassword = ConvertTo-SecureString "3#sdfverM4tt!syner" -AsPlainText -force
+    $credential = New-Object System.Management.Automation.PsCredential("ssetestdom\builduser",$securePassword)
+
     #***************************************************************************
     #***********************  UPDATE QA2/DEV SERVERS  **************************
     #***************************************************************************
@@ -138,5 +153,4 @@ if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pat
         Write-Host "********** DEV Server Ready:  $(Get-Date) **********"
     }
 }
-
 
