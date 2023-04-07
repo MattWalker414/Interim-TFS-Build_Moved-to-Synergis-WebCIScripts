@@ -45,12 +45,13 @@ if ($testType -eq "Nightly")
 
         SetConfig -dbname $database -filePath $configPath -creds $credential
     
-        # Run the tests
+        # Run the tests...
         #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
         testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml        
 
         if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors.
 
+        # Reset config file to use Quality database...
         SetConfig -dbname "Quality" -filePath $configPath -creds $credential                
     }
 }
@@ -59,7 +60,7 @@ else # CI Testing...
         # Edit the config file with Quality database name...
         SetConfig -dbname "Quality" -filePath $configPath -creds $credential
        
-        # Run the tests
+        # Run the tests...
         testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml
 
         if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors
