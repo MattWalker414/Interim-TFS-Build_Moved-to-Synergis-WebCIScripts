@@ -153,4 +153,8 @@ if ($deploy = true)
         Write-Host "********** DEV Server Ready:  $(Get-Date) **********"
     }
 }
+else
+{
+        Write-Host "********** Test failures were detected.  QA/Dev test servers NOT updated! **********"
+}
 
