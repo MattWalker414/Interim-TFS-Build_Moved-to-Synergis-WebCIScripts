@@ -43,7 +43,7 @@ if ($testType -eq "Nightly")
         $database = $info[0]
         $folder = $info[1]
 
-        SetConfig -dbname $database -configPath $configPath -creds $credential
+        SetConfig -dbname $database -filePath $configPath -creds $credential
     
         # Run the tests
         #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
