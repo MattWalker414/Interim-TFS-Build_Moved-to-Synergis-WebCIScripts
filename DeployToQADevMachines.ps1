@@ -5,7 +5,7 @@ Param(
         [string]$inclDev
      )
 
-$deploy = true
+$deploy = $true
 $qaTwoSettings = "\\QA2-12\wwwroot\Synergis.WebApi\appsettings.config"
 $devOneSettings = "\\DEV-12\wwwroot\Synergis.WebApi\appsettings.config"
 $tester = "matt.walker"
@@ -77,14 +77,14 @@ ForEach-Object {
 
     if ($failures -ne 0)
     {        
-        $deploy = false
+        $deploy = $false
     }
     
     Write-Host "$failures Failures detected in" $_.FullName
 }
 
 #if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pattern 'failures="0"') -ne $null)
-if ($deploy = true)
+if ($deploy = $true)
 {
     Write-Host "********** Setting credentials for remote, test server operations... **********"
     $securePassword = ConvertTo-SecureString "3#sdfverM4tt!syner" -AsPlainText -force
@@ -155,6 +155,6 @@ if ($deploy = true)
 }
 else
 {
-        Write-Host "********** Test failures were detected.  QA/Dev test servers NOT updated! **********"
+        Write-Host "********** Test failures were detected.  QA/Dev test servers were NOT updated! **********"
 }
 
