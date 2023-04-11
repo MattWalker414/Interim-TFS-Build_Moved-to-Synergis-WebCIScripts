@@ -46,8 +46,8 @@ if ($testType -eq "Nightly")
         SetConfig -dbname $database -filePath $configPath -creds $credential
     
         # Run the tests...
-        #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml
-        testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml        
+        #testcafe chrome tests/qa/$folder/*.ts -r xunit:report/$database.xml --browser-init-timeout 300000
+        testcafe chrome tests/qa/$folder/check-out-dialog.ts -r xunit:report/$database.xml --browser-init-timeout 300000      
 
         if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors.
 
@@ -61,6 +61,7 @@ else # CI Testing...
         SetConfig -dbname "Quality" -filePath $configPath -creds $credential
        
         # Run the tests...
+        # Add timeout increase if needed --browser-init-timeout 300000
         testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml
 
         if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors
