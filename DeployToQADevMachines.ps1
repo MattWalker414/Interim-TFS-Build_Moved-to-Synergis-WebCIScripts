@@ -76,11 +76,18 @@ ForEach-Object {
     $failures = $xml.testsuite.failures
 
     if ($failures -ne 0)
-    {        
+    {            
         $deploy = $false
-    }
-    
-    Write-Host "$failures Failures detected in" $_.FullName
+        
+        if ($failures -eq $null)
+        {
+            Write-Host "The test result file is empty or failure total not found in" $_.FullName
+        }
+        else
+        {
+            Write-Host "$failures Failures detected in" $_.FullName
+        }
+    }        
 }
 
 #if ((Select-String -Path $source\Testing\TestCafe\Scripts\report\report.xml -Pattern 'failures="0"') -ne $null)
