@@ -34,9 +34,12 @@ function SetConfig
 }
 
 cd $testCafeDir
+Write-Host "Launching tests from: $testCafe"
 
 if ($testType -eq "Nightly")
 {
+    Write-Host "QA test suite will be executed."
+    
     foreach ($test in $funcArea)
     {
         $info = $test.split('.')
@@ -57,12 +60,15 @@ if ($testType -eq "Nightly")
 }
 else # CI Testing...
 {
+        Write-Host "CI test(s) will be executed."
+        
         # Edit the config file with Quality database name...
         SetConfig -dbname "Quality" -filePath $configPath -creds $credential
+        Write-Host "Configuration file set to access the Quality database."
        
         # Run the tests...
         # Add timeout increase if needed --browser-init-timeout 300000
-        testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml
-
-        if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors
+        testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml        
 }
+
+if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors
