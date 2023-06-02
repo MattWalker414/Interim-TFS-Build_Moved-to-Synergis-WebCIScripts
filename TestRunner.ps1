@@ -4,8 +4,8 @@ Param(
         [string]$testType
      )
 
-# Test areas to cycle through based Database name for the connection and folder name for tests (Database.Folder)...
-[string[]]$funcArea = "Checkout.check-out" #, "NextTestArea.NextFolder
+# Test areas to cycle through based on Database name for the connection and folder name for tests (Database.Folder)...
+[string[]]$funcArea = "Checkout.check-out" , "Checkin.check-in" #, "NextTestArea.NextFolder
 
 $securePassword = ConvertTo-SecureString "3#sdfverM4tt!syner" -AsPlainText -force
 $credential = New-Object System.Management.Automation.PsCredential("ssetestdom\builduser",$securePassword)
