@@ -68,7 +68,9 @@ else # CI Testing...
        
         # Run the tests...
         # Add timeout increase if needed --browser-init-timeout 300000
-        testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml        
+        # Running singular, named test caused cannot find tests issue...
+        #testcafe chrome tests/CI/login-out/login-out.ts -r xunit:report/LoginOut.xml        
+        testcafe chrome tests/CI/login-out/*.ts -r xunit:report/LoginOut.xml
 }
 
 if ($lastexitcode -ne 0) { $global:lastexitcode = 0 }  # Ignore TestCafe script errors
